@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { useFontScale } from '@/hooks/use-settings';
+import { useColorSchemePreference, useFontScale } from '@/hooks/use-settings';
 import { useTheme } from '@/hooks/use-theme';
 import {
   CLOTHING_TYPES,
@@ -212,6 +212,9 @@ function ChipGroup({
   onSelect: (value: string) => void;
 }) {
   const theme = useTheme();
+  const scheme = useColorSchemePreference();
+  const unselectedBackground =
+    scheme === 'light' ? theme.accent : theme.backgroundElement;
   return (
     <View style={styles.chipGroup}>
       {options.map((opt) => {
@@ -226,7 +229,7 @@ function ChipGroup({
             style={({ pressed }) => [
               styles.chip,
               {
-                backgroundColor: isSelected ? theme.text : theme.backgroundElement,
+                backgroundColor: isSelected ? theme.text : unselectedBackground,
               },
               pressed && styles.pressed,
             ]}>

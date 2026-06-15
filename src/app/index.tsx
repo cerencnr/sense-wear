@@ -192,7 +192,7 @@ function FakeCamera({
   return (
     <View style={styles.fakeCamera}>
       {cameraEnabled ? (
-        <CameraView style={styles.cameraFeed} facing="back" />
+        <CameraView style={styles.cameraFeed} facing="front" />
       ) : (
         <Pressable
           accessibilityRole="button"
