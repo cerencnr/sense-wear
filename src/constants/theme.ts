@@ -7,20 +7,29 @@ import '@/global.css';
 
 import { Platform } from 'react-native';
 
+// Brand palette
+//  krem (cream)        #ccb498
+//  kahve (brown)       #5f5850
+//  hardal (mustard)    #d4a017
+//  koyu hardal (deep)  #70530b
 export const Colors = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
+    text: '#3D352B',
+    background: '#F5EFE3',
+    backgroundElement: '#EADFC9',
+    backgroundSelected: '#DDCAA6',
+    textSecondary: '#5F5850',
+    accent: '#D4A017',
+    accentText: '#2A2006',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    text: '#F2E9D8',
+    background: '#1E1B17',
+    backgroundElement: '#322D26',
+    backgroundSelected: '#463F35',
+    textSecondary: '#B7AB97',
+    accent: '#D4A017',
+    accentText: '#231A05',
   },
 } as const;
 

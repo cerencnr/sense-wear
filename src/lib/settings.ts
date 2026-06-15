@@ -18,12 +18,22 @@ export const FONT_SCALE: Record<FontSize, number> = {
   xlarge: 1.45,
 };
 
+export type ThemePreference = 'system' | 'light' | 'dark';
+
+export const THEME_OPTIONS: { value: ThemePreference; label: string; description: string }[] = [
+  { value: 'system', label: 'System', description: 'Match your device appearance' },
+  { value: 'light', label: 'Light', description: 'Always use the light palette' },
+  { value: 'dark', label: 'Dark', description: 'Always use the dark palette' },
+];
+
 export type Settings = {
   fontSize: FontSize;
+  theme: ThemePreference;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
   fontSize: 'medium',
+  theme: 'system',
 };
 
 export async function loadSettings(): Promise<Settings> {

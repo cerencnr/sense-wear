@@ -6,11 +6,11 @@ import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useSettings } from '@/hooks/use-settings';
-import { FONT_SIZES, FontSize } from '@/lib/settings';
+import { FONT_SIZES, FontSize, THEME_OPTIONS } from '@/lib/settings';
 
 export default function SettingsScreen() {
   const theme = useTheme();
-  const { settings, setFontSize } = useSettings();
+  const { settings, setFontSize, setTheme } = useSettings();
 
   return (
     <ThemedView style={styles.container}>
@@ -21,6 +21,27 @@ export default function SettingsScreen() {
             <ThemedText themeColor="textSecondary" style={styles.headerSubtitle}>
               Adjust SenseWear to fit your reading comfort
             </ThemedText>
+          </View>
+
+          <View style={styles.section}>
+            <ThemedText type="smallBold" themeColor="textSecondary" style={styles.sectionLabel}>
+              APPEARANCE
+            </ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">
+              Choose light, dark, or follow your device.
+            </ThemedText>
+
+            <View style={styles.optionList}>
+              {THEME_OPTIONS.map((option) => (
+                <ThemeRow
+                  key={option.value}
+                  label={option.label}
+                  description={option.description}
+                  isSelected={option.value === settings.theme}
+                  onSelect={() => setTheme(option.value)}
+                />
+              ))}
+            </View>
           </View>
 
           <View style={styles.section}>
@@ -69,6 +90,51 @@ export default function SettingsScreen() {
         </ScrollView>
       </SafeAreaView>
     </ThemedView>
+  );
+}
+
+function ThemeRow({
+  label,
+  description,
+  isSelected,
+  onSelect,
+}: {
+  label: string;
+  description: string;
+  isSelected: boolean;
+  onSelect: () => void;
+}) {
+  const theme = useTheme();
+  return (
+    <Pressable
+      onPress={onSelect}
+      accessibilityRole="radio"
+      accessibilityState={{ selected: isSelected }}
+      accessibilityLabel={`${label} appearance`}
+      style={({ pressed }) => [
+        styles.row,
+        {
+          backgroundColor: isSelected ? theme.backgroundSelected : theme.backgroundElement,
+          borderColor: isSelected ? theme.accent : 'transparent',
+        },
+        pressed && styles.pressed,
+      ]}>
+      <View style={styles.rowMain}>
+        <ThemedText type="default" style={styles.rowLabel}>
+          {label}
+        </ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">
+          {description}
+        </ThemedText>
+      </View>
+      <View
+        style={[
+          styles.radio,
+          { borderColor: isSelected ? theme.accent : theme.textSecondary },
+        ]}>
+        {isSelected && <View style={[styles.radioDot, { backgroundColor: theme.accent }]} />}
+      </View>
+    </Pressable>
   );
 }
 

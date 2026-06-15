@@ -174,13 +174,13 @@ export default function AddClothingScreen() {
               disabled={!canSave}
               style={({ pressed }) => [
                 styles.saveButton,
-                { backgroundColor: theme.text },
+                { backgroundColor: theme.accent },
                 !canSave && styles.saveButtonDisabled,
                 pressed && styles.pressed,
               ]}>
               <ThemedText
                 type="default"
-                style={[styles.saveLabel, { color: theme.background }]}>
+                style={[styles.saveLabel, { color: theme.accentText }]}>
                 {saving ? 'Saving…' : 'Save to wardrobe'}
               </ThemedText>
             </Pressable>

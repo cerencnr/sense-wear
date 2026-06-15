@@ -1,3 +1,4 @@
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Platform, Pressable, StyleSheet, View } from 'react-native';
@@ -26,8 +27,16 @@ export default function ScanScreen() {
   const theme = useTheme();
   const [wardrobe, setWardrobe] = useState<ClothingItem[]>([]);
   const [state, setState] = useState<ScanState>({ kind: 'idle' });
+  const [permission, requestPermission] = useCameraPermissions();
   const sweep = useRef(new Animated.Value(0)).current;
   const pulse = useRef(new Animated.Value(0)).current;
+
+  // Open the real camera as soon as the screen is shown.
+  useEffect(() => {
+    if (permission && !permission.granted && permission.canAskAgain) {
+      requestPermission();
+    }
+  }, [permission, requestPermission]);
 
   useFocusEffect(
     useCallback(() => {
@@ -122,6 +131,8 @@ export default function ScanScreen() {
             ) : (
               <FakeCamera
                 state={state.kind}
+                cameraEnabled={!!permission?.granted}
+                onEnableCamera={requestPermission}
                 sweepTranslate={sweepTranslate}
                 pulseScale={pulseScale}
                 pulseOpacity={pulseOpacity}
@@ -143,13 +154,13 @@ export default function ScanScreen() {
             disabled={state.kind === 'scanning'}
             style={({ pressed }) => [
               styles.scanButton,
-              { backgroundColor: theme.text },
+              { backgroundColor: theme.accent },
               pressed && styles.pressed,
               state.kind === 'scanning' && styles.scanButtonDisabled,
             ]}>
             <ThemedText
               type="default"
-              style={[styles.scanButtonLabel, { color: theme.background }]}>
+              style={[styles.scanButtonLabel, { color: theme.accentText }]}>
               {state.kind === 'scanning'
                 ? 'Analyzing…'
                 : state.kind === 'result'
@@ -165,19 +176,37 @@ export default function ScanScreen() {
 
 function FakeCamera({
   state,
+  cameraEnabled,
+  onEnableCamera,
   sweepTranslate,
   pulseScale,
   pulseOpacity,
 }: {
   state: ScanState['kind'];
+  cameraEnabled: boolean;
+  onEnableCamera: () => void;
   sweepTranslate: Animated.AnimatedInterpolation<number>;
   pulseScale: Animated.AnimatedInterpolation<number>;
   pulseOpacity: Animated.AnimatedInterpolation<number>;
 }) {
   return (
     <View style={styles.fakeCamera}>
-      <View style={styles.cameraGrain} />
+      {cameraEnabled ? (
+        <CameraView style={styles.cameraFeed} facing="back" />
+      ) : (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Enable camera"
+          onPress={onEnableCamera}
+          style={styles.permissionPrompt}>
+          <ThemedText type="small" style={styles.cameraText}>
+            Tap to enable the camera
+          </ThemedText>
+        </Pressable>
+      )}
+      <View style={styles.cameraGrain} pointerEvents="none" />
       <Animated.View
+        pointerEvents="none"
         style={[
           styles.reticle,
           { transform: [{ scale: pulseScale }], opacity: pulseOpacity },
@@ -185,10 +214,11 @@ function FakeCamera({
       />
       {state === 'scanning' && (
         <Animated.View
+          pointerEvents="none"
           style={[styles.scanLine, { transform: [{ translateY: sweepTranslate }] }]}
         />
       )}
-      <View style={styles.cameraTextWrap}>
+      <View style={styles.cameraTextWrap} pointerEvents="none">
         <ThemedText type="small" style={styles.cameraText}>
           {state === 'scanning' ? 'Detecting colors and patterns…' : 'Camera ready'}
         </ThemedText>
@@ -315,6 +345,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  cameraFeed: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  permissionPrompt: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   cameraGrain: {
     position: 'absolute',
     top: 0,
@@ -335,9 +381,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 2,
-    backgroundColor: Colors.light.background,
-    opacity: 0.7,
-    shadowColor: '#ffffff',
+    backgroundColor: Colors.light.accent,
+    opacity: 0.85,
+    shadowColor: Colors.light.accent,
     shadowOpacity: 0.8,
     shadowRadius: 12,
   },
